@@ -3,6 +3,7 @@
 namespace ResqueBundle\Resque;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -12,6 +13,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 abstract class ContainerAwareJob extends Job
 {
+    const ENV_KERNEL_CLASS = 'KERNEL_CLASS';
+    const ENV_USE_DOT_ENV = 'USE_DOT_ENV';
+
     /**
      * @var KernelInterface
      */
@@ -53,13 +57,21 @@ abstract class ContainerAwareJob extends Job
      */
     protected function createKernel()
     {
-        $finder = new Finder();
-        $finder->name('*Kernel.php')->depth(0)->in($this->args['kernel.root_dir']);
-        $results = iterator_to_array($finder);
-        $file = current($results);
-        $class = $file->getBasename('.php');
+        if (array_key_exists(self::ENV_KERNEL_CLASS, $_SERVER)) {
+            $class = $_SERVER[self::ENV_KERNEL_CLASS];
+        } else {
+            $finder = new Finder();
+            $finder->name('*Kernel.php')->depth(0)->in($this->args['kernel.root_dir']);
+            $results = iterator_to_array($finder);
+            $file = current($results);
+            $class = $file->getBasename('.php');
 
-        require_once $file;
+            require_once $file;
+        }
+
+        if (array_key_exists(self::ENV_USE_DOT_ENV, $_SERVER) && $_SERVER[self::ENV_USE_DOT_ENV]) {
+            (new Dotenv())->load(__DIR__.'/../../../.env');
+        }
 
         return new $class(
             isset($this->args['kernel.environment']) ? $this->args['kernel.environment'] : 'dev',
