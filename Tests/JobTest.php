@@ -5,8 +5,7 @@
  * @copyright Copyright (C) 2016 Blue Flame IT Ltd. All rights reserved.
  */
 
-namespace ResqueBundle\Resque;
-
+namespace ResqueBundle\Resque\Tests;
 
 class JobTest extends \PHPUnit\Framework\TestCase
 {
