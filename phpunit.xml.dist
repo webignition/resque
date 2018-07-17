@@ -7,6 +7,10 @@
          colors="true"
          bootstrap="./vendor/autoload.php"
 >
+    <php>
+        <env name="DOTENV_PATH" value="Tests/Configuration/.env"/>
+        <env name="KERNEL_CLASS" value="ResqueBundle\Resque\Tests\Implementation\Kernel"/>
+    </php>
 
     <testsuites>
         <testsuite name="ResqueBundle Test Suite">
