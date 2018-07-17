@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * Class ConfigurationTest
  * @package ResqueBundle\Resque\Tests\DependencyInjection
  */
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      *
