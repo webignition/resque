@@ -4,7 +4,6 @@ namespace ResqueBundle\Resque;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -14,7 +13,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 abstract class ContainerAwareJob extends Job
 {
     const ENV_KERNEL_CLASS = 'KERNEL_CLASS';
-    const ENV_USE_DOT_ENV = 'USE_DOT_ENV';
+    const ENV_DOT_ENV_PATH = 'DOTENV_PATH';
 
     /**
      * @var KernelInterface
@@ -57,25 +56,46 @@ abstract class ContainerAwareJob extends Job
      */
     protected function createKernel()
     {
-        if (array_key_exists(self::ENV_KERNEL_CLASS, $_SERVER)) {
-            $class = $_SERVER[self::ENV_KERNEL_CLASS];
-        } else {
-            $finder = new Finder();
-            $finder->name('*Kernel.php')->depth(0)->in($this->args['kernel.root_dir']);
-            $results = iterator_to_array($finder);
-            $file = current($results);
-            $class = $file->getBasename('.php');
+        if (!isset($_ENV['APP_ENV'])) {
+            if (!class_exists(Dotenv::class)) {
+                throw new \RuntimeException(
+                    'APP_ENV environment variable is not defined. You need to define environment variables '
+                    .'for configuration or add "symfony/dotenv" as a Composer dependency to load variables from a '
+                    .'.env file.'
+                );
+            }
 
-            require_once $file;
+            if (!isset($_ENV[self::ENV_DOT_ENV_PATH])) {
+                throw $this->createEnvironmentVariableNotSetException(self::ENV_DOT_ENV_PATH);
+            }
+
+            $dotEnvPath = $_ENV[self::ENV_DOT_ENV_PATH];
+            if (substr($dotEnvPath, 0, 1) !== '/') {
+                $dotEnvPath = __DIR__ . '/' . $dotEnvPath;
+            }
+
+            (new Dotenv())->load($dotEnvPath);
         }
 
-        if (array_key_exists(self::ENV_USE_DOT_ENV, $_SERVER) && $_SERVER[self::ENV_USE_DOT_ENV]) {
-            (new Dotenv())->load(__DIR__.'/../../../.env');
+        if (!isset($_ENV[self::ENV_KERNEL_CLASS])) {
+            throw $this->createEnvironmentVariableNotSetException(self::ENV_KERNEL_CLASS);
         }
+
+        $class = $_ENV[self::ENV_KERNEL_CLASS];
 
         return new $class(
             isset($this->args['kernel.environment']) ? $this->args['kernel.environment'] : 'dev',
             isset($this->args['kernel.debug']) ? $this->args['kernel.debug'] : TRUE
         );
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return \RuntimeException
+     */
+    private function createEnvironmentVariableNotSetException($name)
+    {
+        return new \RuntimeException(sprintf('%s environment variable not set', $name));
     }
 }

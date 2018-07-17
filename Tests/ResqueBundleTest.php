@@ -5,12 +5,11 @@
  * @copyright Copyright (C) 2016 Blue Flame IT Ltd. All rights reserved.
  */
 
-namespace ResqueBundle\Resque;
+namespace ResqueBundle\Resque\Tests;
 
-use PHPUnit\Framework\TestCase;
+use ResqueBundle\Resque\ResqueBundle;
 
-
-class ResqueBundleTest extends TestCase
+class ResqueBundleTest extends \PHPUnit\Framework\TestCase
 {
 
     /**
