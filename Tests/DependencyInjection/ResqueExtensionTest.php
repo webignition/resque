@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Class ResqueExtensionTest
  * @package ResqueBundle\Resque\Tests\DependencyInjection
  */
-class ResqueExtensionTest extends \PHPUnit_Framework_TestCase
+class ResqueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Symfony\Component\DependencyInjection\ContainerBuilder
