@@ -56,7 +56,7 @@ abstract class ContainerAwareJob extends Job
      */
     protected function createKernel()
     {
-        if (!isset($_ENV['APP_ENV'])) {
+        if (!isset($_SERVER['APP_ENV'])) {
             if (!class_exists(Dotenv::class)) {
                 throw new \RuntimeException(
                     'APP_ENV environment variable is not defined. You need to define environment variables '
@@ -65,11 +65,11 @@ abstract class ContainerAwareJob extends Job
                 );
             }
 
-            if (!isset($_ENV[self::ENV_DOT_ENV_PATH])) {
+            if (!isset($_SERVER[self::ENV_DOT_ENV_PATH])) {
                 throw $this->createEnvironmentVariableNotSetException(self::ENV_DOT_ENV_PATH);
             }
 
-            $dotEnvPath = $_ENV[self::ENV_DOT_ENV_PATH];
+            $dotEnvPath = $_SERVER[self::ENV_DOT_ENV_PATH];
             if (substr($dotEnvPath, 0, 1) !== '/') {
                 $dotEnvPath = __DIR__ . '/' . $dotEnvPath;
             }
@@ -77,11 +77,11 @@ abstract class ContainerAwareJob extends Job
             (new Dotenv())->load($dotEnvPath);
         }
 
-        if (!isset($_ENV[self::ENV_KERNEL_CLASS])) {
+        if (!isset($_SERVER[self::ENV_KERNEL_CLASS])) {
             throw $this->createEnvironmentVariableNotSetException(self::ENV_KERNEL_CLASS);
         }
 
-        $class = $_ENV[self::ENV_KERNEL_CLASS];
+        $class = $_SERVER[self::ENV_KERNEL_CLASS];
 
         return new $class(
             isset($this->args['kernel.environment']) ? $this->args['kernel.environment'] : 'dev',
