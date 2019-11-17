@@ -17,10 +17,17 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('resque');
+        $treeBuilder = new TreeBuilder('resque');
 
-        $rootNode
+        if (method_exists($treeBuilder,'getRootNode')){
+            // Symfony 4+
+            $root =   $treeBuilder->getRootNode();
+        } else {
+            // Symfony 3
+            $root = $treeBuilder->root('resque');
+        }
+        
+        $root
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('vendor_dir')
@@ -29,8 +36,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Set the vendor dir')
                 ->end()
                 ->scalarNode('app_include')
-                    ->defaultValue('%kernel.root_dir%/../var/bootstrap.php.cache')
-                    ->cannotBeEmpty()
+                    ->defaultValue(null)
                     ->info('Set the APP_INCLUDE for php-resque')
                 ->end()
                 ->scalarNode('prefix')

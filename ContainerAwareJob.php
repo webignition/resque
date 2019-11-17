@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * Class ContainerAwareJob
  * @package ResqueBundle\Resque
  */
-abstract class ContainerAwareJob extends Job
+abstract class ContainerAwareJob
 {
     const ENV_KERNEL_CLASS = 'KERNEL_CLASS';
     const ENV_DOT_ENV_PATH = 'DOTENV_PATH';
